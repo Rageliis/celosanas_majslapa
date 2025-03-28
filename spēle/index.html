@@ -1,0 +1,75 @@
+<html>
+<body>
+<canvas id="myCanvas" width=500 height=500 style="border:2px solid"> </canvas> 
+<script>
+
+var ctx = myCanvas.getContext("2d"); // Iegūst zīmēšanas kontekstu kanvas objektam
+
+// funkcija, nospiez taustinu un pārvietojas bļoda
+function MyKeyDownHandler(MyEvent) { 
+    if (MyEvent.keyCode == 37 && bowl_x > 0) { // Pārvieto bļodu pa kreisi, ja nospiez kreiso bultiņas taustiņš 
+        bowl_x = bowl_x - 10;
+    } 
+    if (MyEvent.keyCode == 39 && bowl_x + 50 < myCanvas.width) { // Pārvieto bļodu pa labi, ja  nospiez labo bultiņas taustiņš
+        bowl_x = bowl_x + 10;
+    }
+}
+
+addEventListener("keydown", MyKeyDownHandler); // Pievieno notikuma klausītāju taustiņu nospiešanai
+
+// Bļoda
+var bowl_x = 0; // Bļodas  x  pozīcija
+var bowl_y = 0; // Bļodas y pozīcija 
+var BowlImg = new Image(); // Izveido attēlu objektu bļodai
+BowlImg.src = "bowl.png"; // ievieto bļodas attēlu 
+
+// Konfekte 
+var candy_x = 0; // Konfektes  x  pozīcija
+var candy_y = 0; // Konfektes y pozīcija
+var CandyImg = new Image(); // Izveido attēlu objektu konfektei
+CandyImg.src = "candy.png"; // Ievieto konfektes attēla 
+var score = 0; // I rezultāts
+
+// spēles cikla funkcija
+function Do_a_Frame() {
+    ctx.clearRect(0, 0, myCanvas.width, myCanvas.height); // Notīra canvu pēc katras kadra zīmēšanas
+
+    //  rezultātu uz kanvas
+    ctx.fillStyle = "purple"; //  teksta krāsu
+    ctx.font = "30px Arial"; //  teksta fontu un izmēru
+    ctx.fillText("Score: " + score, 0, 30); // Parādām rezultātu
+
+    // Zīmējam bļodu
+    bowl_y = myCanvas.height - 100; // novieto bļodu canvas apakšā
+    ctx.drawImage(BowlImg, bowl_x, bowl_y, 100, 100); //  bļoda ar 50x50 px
+
+    // Atjauno konfektes pozīciju, lai tā kustētos uz leju
+    candy_y = candy_y + 5;
+
+    // Kolīzijas detekcija: pārbaudām, vai konfekte pārklājas ar bļodu
+    if (
+        candy_y + 50 >= bowl_y && // Konfekte sasniedz bļodu vertikāli
+        candy_x + 50 >= bowl_x && // Konfekte pārklājas ar bļodu horizontāli (laba puse)
+        candy_x <= bowl_x + 50    // Konfekte pārklājas ar bļodu horizontāli (kreisais puse)
+    ) {
+        score++; // Palielina rezultātu
+        candy_y = 0; // konfektes pozīciju aiziet atpakal uz augšu
+        candy_x = Math.random() * (myCanvas.width - 50); // random maina x pozīciju
+    }
+
+    // Atiestata konfektes pozīciju, ja tā nokrīt uz canvas apakšas
+    if (candy_y > myCanvas.height) {
+        candy_y = 0; // atgriezas uz augšu
+        candy_x = Math.random() * (myCanvas.width - 50); // random maina horizontālo pozīciju
+    }
+
+    // Zīmē konfekti
+    ctx.drawImage(CandyImg, candy_x, candy_y, 70, 70); // Zīmē konfekti 50x50 px
+}
+
+setInterval(Do_a_Frame, 25); // Palaiž spēles ciklu katru 25 milisekundes
+
+</script>
+</body>
+</html>
+
